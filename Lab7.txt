@@ -1,0 +1,33 @@
+import sys
+import math
+
+# Функція алгоритму Гельфонда — Шенкса
+def baby_step_giant_step(g, h, q):
+    """
+    Знаходить X, що задовольняє рівняння g^X ≡ h (mod q)
+    """
+    n = math.isqrt(q) + 1  # Розмір підмножин (⌈√q⌉)
+
+    # Крок 1: Обчислення Baby-step
+    baby_steps = {}
+    for i in range(n):
+        value = pow(g, i, q)
+        baby_steps[value] = i
+
+    # Крок 2: Обчислення Giant-step
+    g_inv_n = pow(g, -n, q)  # g^(-n) mod q
+    current = h
+
+    for j in range(n):
+        if current in baby_steps:
+            return j * n + baby_steps[current]  # Знаходимо X
+        current = (current * g_inv_n) % q
+
+    return -1  # Якщо розв'язку немає
+
+# Зчитування вхідних даних
+g, h, q = [int(i) for i in input().split()]
+
+# Виклик алгоритму
+x = baby_step_giant_step(g, h, q)
+print(x)
