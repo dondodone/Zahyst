@@ -1,0 +1,65 @@
+import sys
+import math
+from collections import Counter
+
+# Стандартна частотність літер в англійській мові
+ENGLISH_FREQ = {
+    'A': 8.08, 'B': 1.67, 'C': 3.18, 'D': 3.99, 'E': 12.56, 'F': 2.17, 'G': 1.80, 'H': 5.27,
+    'I': 7.24, 'J': 0.14, 'K': 0.63, 'L': 4.04, 'M': 2.60, 'N': 7.38, 'O': 7.47, 'P': 1.91,
+    'Q': 0.09, 'R': 6.42, 'S': 6.59, 'T': 9.15, 'U': 2.79, 'V': 1.00, 'W': 1.89, 'X': 0.21,
+    'Y': 1.65, 'Z': 0.07
+}
+
+# Функція для розшифрування шифру Цезаря з певним зсувом
+def caesar_decrypt(text, shift):
+    decrypted_text = []
+    
+    for char in text:
+        if char.isalpha():
+            base = ord('A') if char.isupper() else ord('a')  # Для великих та малих літер
+            shifted_char = chr((ord(char) - base - shift) % 26 + base)
+            decrypted_text.append(shifted_char)
+        else:
+            decrypted_text.append(char)  # Залишаємо не алфавітні символи без змін
+    
+    return ''.join(decrypted_text)
+
+# Функція для знаходження частот літер у тексті
+def letter_frequency(text):
+    letter_counts = Counter(char.upper() for char in text if char.isalpha())
+    total_letters = sum(letter_counts.values())
+    return {char: count / total_letters * 100 for char, count in letter_counts.items()}
+
+# Читання зашифрованого повідомлення
+message = input()
+
+# Знаходження найкращого зсуву через порівняння частот літер
+def find_best_shift(message):
+    message_freq = letter_frequency(message)
+    best_shift = 0
+    best_score = float('inf')
+
+    # Пробуємо кожен зсув від 0 до 25
+    for shift in range(26):
+        # Розшифровуємо повідомлення з поточним зсувом
+        decrypted_message = caesar_decrypt(message, shift)
+        decrypted_freq = letter_frequency(decrypted_message)
+
+        # Вираховуємо "відстань" між частотами літер
+        score = sum((decrypted_freq.get(char, 0) - ENGLISH_FREQ.get(char, 0))**2 for char in ENGLISH_FREQ)
+        
+        # Якщо цей зсув дає кращий результат, запам'ятовуємо його
+        if score < best_score:
+            best_score = score
+            best_shift = shift
+    
+    return best_shift
+
+# Знаходимо найкращий зсув
+best_shift = find_best_shift(message)
+
+# Розшифровуємо повідомлення з найкращим зсувом
+decoded_message = caesar_decrypt(message, best_shift)
+
+# Виводимо розшифроване повідомлення
+print(decoded_message)
