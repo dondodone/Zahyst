@@ -1,0 +1,51 @@
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import pad, unpad
+from Crypto.Random import get_random_bytes
+
+# Реалізація AES у режимі CBC (Cipher Block Chaining)
+
+def encrypt_aes_cbc(plaintext, key):
+    """
+    Зашифровує текст за допомогою AES у режимі CBC.
+    
+    Параметри:
+        plaintext (str): Вхідний текст для шифрування.
+        key (bytes): Ключ для шифрування (16, 24 або 32 байти).
+
+    Повертає:
+        tuple: Ініціалізаційний вектор (IV) та зашифровані дані.
+    """
+    cipher = AES.new(key, AES.MODE_CBC)  # Створюємо шифратор у режимі CBC
+    iv = cipher.iv  # Генеруємо ініціалізаційний вектор (IV)
+    ciphertext = cipher.encrypt(pad(plaintext.encode(), AES.block_size))  # Шифруємо з доповненням
+    return iv, ciphertext
+
+def decrypt_aes_cbc(iv, ciphertext, key):
+    """
+    Розшифровує текст, зашифрований AES у режимі CBC.
+    
+    Параметри:
+        iv (bytes): Ініціалізаційний вектор.
+        ciphertext (bytes): Зашифровані дані.
+        key (bytes): Ключ для розшифрування (16, 24 або 32 байти).
+
+    Повертає:
+        str: Розшифрований текст.
+    """
+    cipher = AES.new(key, AES.MODE_CBC, iv)  # Створюємо шифратор із заданим IV
+    plaintext = unpad(cipher.decrypt(ciphertext), AES.block_size)  # Розшифровуємо з видаленням доповнення
+    return plaintext.decode()
+
+# Приклад використання
+if __name__ == "__main__":
+    key = get_random_bytes(16)  # Генеруємо випадковий 16-байтний ключ
+    plaintext = "Це секретне повідомлення."
+
+    # Зашифрування
+    iv, ciphertext = encrypt_aes_cbc(plaintext, key)
+    print("Ініціалізаційний вектор (IV):", iv)
+    print("Зашифрований текст:", ciphertext)
+
+    # Розшифрування
+    decrypted_text = decrypt_aes_cbc(iv, ciphertext, key)
+    print("Розшифрований текст:", decrypted_text)
