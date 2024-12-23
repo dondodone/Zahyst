@@ -1,0 +1,34 @@
+from collections import Counter
+
+def encode(text):
+    """
+    Кодує текст за допомогою коду Хеммінга.
+    """
+    encoded_bits = []
+    for char in text:
+        ascii_value = ord(char)  # Отримуємо ASCII-код символу
+        binary_value = f"{ascii_value:08b}"  # Перетворюємо у 8-бітове двійкове число
+        # Повторюємо кожен біт тричі
+        tripled_bits = ''.join(bit * 3 for bit in binary_value)
+        encoded_bits.append(tripled_bits)
+    return ''.join(encoded_bits)  # Об'єднуємо всі закодовані біти в один рядок
+
+def decode(encoded_text):
+    """
+    Декодує текст, закодований кодом Хеммінга, і виправляє помилки.
+    """
+    # Розбиваємо текст на трійки
+    triples = [encoded_text[i:i+3] for i in range(0, len(encoded_text), 3)]
+    
+    # Коригуємо кожну трійку, вибираючи найчастіший біт
+    corrected_bits = ''.join(Counter(triple).most_common(1)[0][0] for triple in triples)
+    
+    # Розбиваємо виправлені біти на байти (по 8 бітів)
+    bytes_list = [corrected_bits[i:i+8] for i in range(0, len(corrected_bits), 8)]
+    
+    # Перетворюємо кожен байт у десяткове число (ASCII)
+    ascii_values = [int(byte, 2) for byte in bytes_list]
+    
+    # Перетворюємо ASCII-коди у символи та об'єднуємо їх у рядок
+    decoded_text = ''.join(chr(ascii_value) for ascii_value in ascii_values)
+    return decoded_text
