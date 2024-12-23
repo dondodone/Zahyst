@@ -1,0 +1,12 @@
+import hashlib
+
+def crack(hash):
+    # Перебираємо всі можливі 5-значні PIN-коди
+    for i in range(100000):  # Від 00000 до 99999
+        # Форматуємо PIN як 5-значний рядок
+        pin = f"{i:05}"
+        # Генеруємо хеш MD5 для поточного PIN
+        pin_hash = hashlib.md5(pin.encode()).hexdigest()
+        # Перевіряємо, чи згенерований хеш співпадає із заданим хешем
+        if pin_hash == hash:
+            return pin  # Повертаємо відповідний PIN
