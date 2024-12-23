@@ -1,0 +1,32 @@
+import sys
+import math
+
+# Функція для перетворення шістнадцяткового рядка в байти
+def hex_to_bytes(hex_str):
+    return bytes.fromhex(hex_str)
+
+# Функція для перетворення масиву байтів в ASCII рядок
+def bytes_to_ascii(byte_array):
+    return byte_array.decode('ascii', errors='ignore')
+
+# Зчитування вхідних повідомлень
+message_1 = input().strip()  # C1: закодоване повідомлення Аліси
+message_2 = input().strip()  # C2: закодоване повідомлення Боба
+message_3 = input().strip()  # C3: розкодоване повідомлення Аліси
+
+# Перетворення шістнадцяткових повідомлень у байти
+C1 = hex_to_bytes(message_1)
+C2 = hex_to_bytes(message_2)
+C3 = hex_to_bytes(message_3)
+
+# Обчислення K_A (ключ Аліси) з C2 і C3
+K_A = bytes(a ^ b for a, b in zip(C2, C3))
+
+# Тепер можемо отримати M (оригінальне повідомлення) використовуючи C1 і K_A
+M = bytes(a ^ b for a, b in zip(C1, K_A))
+
+# Перетворення оригінального повідомлення в ASCII
+clear_text = bytes_to_ascii(M)
+
+# Виведення розшифрованого повідомлення
+print(clear_text)
