@@ -1,0 +1,22 @@
+def scanner(qrcode):
+    # Функція-генератор для обходу даних у правильному порядку
+    def zigzag_path():
+        x, y, direction = 20, 20, -1  # Початкова точка (нижній правий кут)
+        while y > 13:  # Ігноруємо "синю зону"
+            for dy in range(2):  # Зчитуємо два сусідні стовпці
+                yield x, y - dy
+            x += direction
+            if x == 8 or x > 20:  # Зміна напрямку
+                direction *= -1
+                y -= 2
+                x = 9 if x == 8 else 20
+
+    # Формуємо бітову послідовність
+    bits = ''.join(str(qrcode[x][y] ^ ((x + y) % 2 == 0)) for x, y in zigzag_path())
+
+    # Зчитуємо довжину повідомлення (8 бітів після режиму)
+    size = int(bits[4:12], 2)
+
+    # Перетворюємо біти на символи
+    message = ''.join(chr(int(bits[i:i + 8], 2)) for i in range(12, 12 + 8 * size, 8))
+    return message
